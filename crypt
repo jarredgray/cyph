@@ -1,0 +1,313 @@
+#!/bin/bash
+read_file(){
+        echo "in read, enter a file location"
+        read file
+#        filename= $(cat <"$file")
+#        echo $filename
+        filename=$(for word in `cat $file`
+        do
+                echo $word
+        done)
+     #   filename=$(echo "$filenam" | tr -d "\n")
+        echo $filename
+     #   echo $filename
+}
+
+
+
+
+CC(){
+if [ -v message ]
+then
+tex=$message
+echo $tex "is your message"
+elif [ -v filename ]
+then
+tex=$filename
+echo $tex "is your file"
+else
+echo "you have not enetered a message, please do so now to continue (CTRL C to abort.)"
+read tex
+fi
+
+while true; do
+echo "Choose 1 for Encrypt or 2 for Decrypt"
+echo -n "Enter your choice, or 0 for exit: "
+read choice
+case $choice in
+     1)
+     secret=$(echo "$tex" | tr "[A-Za-z]" "[D-ZA-Cd-za-c]")
+     echo "Shifted 3: $secret"        
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$secret" > $nameoffile
+     else
+     break;
+     fi     
+     break
+     ;;
+     2)
+     unsecret=$(echo "$tex" | tr "[D-ZA-Cd-za-c]" "[A-Za-z]")
+     echo "Unshifted 3: $unsecret"         
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$unsecret" > $nameoffile
+     else
+     break;
+     fi
+     break
+     ;;
+     0)
+     echo "OK, see you!"
+     break
+     ;;
+     *)
+     echo "That is not a valid choice, try a number from 0 to 10."
+     ;;
+esac  
+done
+}
+
+
+
+
+rot13(){
+if [ -v message ]
+then
+tex=$message
+echo $tex "is your message"
+elif [ -v filename ]
+then
+tex=$filename
+echo $tex "is your file"
+else
+echo "you have not enetered a message, please do so now to continue (CTRL C to abort.)"
+read tex
+fi
+
+while true; do
+echo "Choose 1 for Encrypt or 2 for Decrypt"
+echo -n "Enter your choice, or 0 for exit: "
+read choice
+case $choice in
+     1)
+     secret=$(echo "$tex" | tr "[a-zA-Z]" "[n-za-mN-ZA-M]")
+     echo "Shifted 13: $secret"              
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$secret" > $nameoffile
+     else
+     break;
+     fi
+     break
+     ;;
+     2)
+     unsecret=$(echo "$tex" | tr "[n-za-mN-ZA-M]" "[a-zA-Z]")
+     echo "Unshifted 13: $unsecret"
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$unsecret" > $nameoffile
+     else
+     break;
+     fi     
+     break
+     ;;
+     0)
+     echo "OK, see you!"
+     break
+     ;;
+     *)
+     echo "That is not a valid choice, try a number from 0 to 10."
+     ;;
+esac  
+done
+}
+
+
+
+
+vigenere(){
+abcs=abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz
+ABCS=ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ
+xyzs=$(echo "$abcs" | rev)
+XYZS=$(echo "$ABCS" | rev)
+#echo $xyzs
+#echo $XYZS
+echo "please enter a number (between 1 and 26) to shift by"
+read snum
+re='^[0-9]+$'
+if ! [[ $snum =~ $re ]] ; then
+   echo "error: Not a number, please enter a valid number"
+   read snum
+fi
+
+while true; do 
+if (($snum > 26)) ; then
+echo "shift is greater than 26, enter new number"
+read snum
+continue 
+else 
+break
+fi
+done
+# also add ability to save file
+if [ -v message ]
+then
+tex=$message
+echo $tex "is your message"
+elif [ -v filename ]
+then
+tex=$filename
+echo $tex "is your file"
+else
+echo "you have not enetered a message, please do so now to continue (CTRL C to abort.)"
+read tex
+fi
+#i feel like i should replace this case with an if, not sure if it matters
+#might look a little nicer? or is this a good use of a case statment?
+while true; do
+echo "Choose 1 for Encrypt or 2 for Decrypt"
+echo -n "Enter your choice, or 0 for exit: "
+read choice
+case $choice in
+     1)
+     secret=$(echo "$tex" | tr "${abcs:0:26}" "${abcs:${snum}:26}" | tr "${ABCS:0:26}" "${ABCS:${snum}:26}")
+     echo "Shifted by $snum: $secret"
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$secret" > $nameoffile
+     else
+     break;
+     fi     
+     break
+     ;;
+     2)
+     unsecret=$(echo "$tex" | tr "${xyzs:${snum}:26}" "${xyzs:0:26}" | tr "${XYZS:0:26}" "${XYZS:${snum}:26}")
+     echo "Unshifted by $snum: $unsecret"
+     echo "to save this to a file, enter 1, hit any other key to continue"
+     read savef
+     if (($savef == 1 )) ; then
+     echo "what is the name of your file"
+     read nameoffile
+     echo "$unsecret" > $nameoffile
+     else
+     break;
+     fi     
+     break
+     ;;
+     0)
+     echo "OK, see you!"
+     break
+     ;;
+     *)
+     echo "That is not a valid choice, try a number from 0 to 10."
+     ;;
+esac  
+done
+}
+
+
+
+
+#read message func
+read_w(){
+        echo "in write"
+        read message
+        echo $messgae
+}
+
+while true; do 
+
+
+while true; do
+echo "type a message or upload a file?"
+echo "1.  types a message"
+echo "2.  uploads a file"
+
+
+echo -n "Enter your choice, or 0 for exit: "
+read choice
+
+
+case $choice in
+     1)
+     read_w
+     break
+     ;;
+     2)
+     read_file
+     break
+     ;;
+     0)
+     echo "OK, see you!"
+     break
+     ;;
+     *)
+     echo "That is not a valid choice, try a number from 0 to 10."
+     ;;
+esac  
+done
+
+
+while true; do
+echo "choose your cipher"
+echo "1.  Casesar Cipher"
+echo "2.  ROT13"
+echo "3.  Vigenere Cipher"
+
+echo -n "Enter your choice, or 0 for exit: "
+read choice
+
+case $choice in
+     1)
+     CC
+     break
+     ;;
+     2)
+     rot13
+     break
+     ;;
+     3)
+     vigenere
+     break
+     ;;
+     0)
+     echo "OK, see you!"
+     break
+     ;;
+     *)
+     echo "That is not a valid choice, try a number from 0 to 10."
+     ;;
+esac  
+done
+
+
+echo "please enter 1 to return to the beggining, or 0 to exit"
+read exd
+if (($exd == 1 )) ; then
+#empty variable so if repeating the script does not default to the typed message
+unset message
+unset filename
+continue
+elif (($exd == 0 )) ; then 
+exit 1
+else
+exit 1
+fi
+
+done
